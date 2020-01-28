@@ -1,0 +1,13 @@
+[package]
+name = "shredder_derive"
+version = "0.1.0"
+authors = ["Gregor Peach <gregorpeach@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["extra-traits"] }
+
+[lib]
+proc-macro = true
