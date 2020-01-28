@@ -57,7 +57,7 @@ fn id_skip(found_skip: &mut bool, found_unsafe_skip: &mut bool, nested_attrs: &N
             match m {
                 Meta::Path(p) => {
                     if p.segments.len() != 1 {
-                        panic!("Strange path in `shredder` marker macro {:?}", p.segments);
+                        panic!("Strange path in `shredder` macro: `{}`", p.segments.to_token_stream());
                     }
                     let first = p.segments.first().map(|v| v.ident.to_string());
 
@@ -71,13 +71,18 @@ fn id_skip(found_skip: &mut bool, found_unsafe_skip: &mut bool, nested_attrs: &N
                         return;
                     }
 
-                    panic!("Invalid `shredder` flag {:?}", first);
+                    panic!("Invalid `shredder` flag: `{}`", first.unwrap_or("[flag missing]".to_string()));
                 },
-                o => panic!("Strange content of `shredder` marker macro {:?}", o)
+                Meta::List(list) => {
+                    panic!("Unknown nested marker in `shredder` macro: `{}`", list.to_token_stream());
+                }
+                Meta::NameValue(name) => {
+                    panic!("Unknown key/value pair in `shredder` macro: `{}`", name.to_token_stream());
+                }
             }
         },
         NestedMeta::Lit(lit) => {
-            panic!("Strange literal in `shredder` marker macro {:?}", lit);
+            panic!("Strange literal in `shredder` marker macro: `{}`", lit.to_token_stream());
         },
     }
 }
