@@ -1,7 +1,15 @@
 [package]
 name = "shredder_derive"
-version = "0.1.0"
+description = "Backing derives for the shredder library"
+categories = []
+keywords = []
+
 authors = ["Gregor Peach <gregorpeach@gmail.com>"]
+repository = "https://github.com/Others/shredder_derive"
+
+license = "MIT"
+
+version = "0.1.0"
 edition = "2018"
 
 [dependencies]
