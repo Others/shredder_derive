@@ -58,12 +58,14 @@ impl DeriveFlags {
 
 pub struct DeriveFieldFlags {
     pub skip_scan: bool,
+    pub skip_finalize: bool,
     pub unsafe_skip_gc_deref: bool,
     pub unsafe_skip_gc_drop: bool,
     pub unsafe_skip_gc_safe: bool,
 }
 
 const SKIP_SCAN: &str = "skip_scan";
+const SKIP_FINALIZE: &str = "skip_finalize";
 const UNSAFE_SKIP_GC_DEREF: &str = "unsafe_skip_gc_deref";
 const UNSAFE_SKIP_GC_DROP: &str = "unsafe_skip_gc_drop";
 const UNSAFE_SKIP_GC_SAFE: &str = "unsafe_skip_gc_safe";
@@ -72,6 +74,7 @@ const UNSAFE_SKIP_ALL: &str = "unsafe_skip_all";
 impl DeriveFieldFlags {
     pub fn new(attrs: &[Attribute]) -> Result<Self, DeriveError> {
         let mut skip_scan = false;
+        let mut skip_finalize = false;
         let mut unsafe_skip_gc_deref = false;
         let mut unsafe_skip_gc_drop = false;
         let mut unsafe_skip_gc_safe = false;
@@ -88,6 +91,15 @@ impl DeriveFieldFlags {
                             }));
                         } else {
                             skip_scan = true;
+                        }
+                    }
+                    SKIP_FINALIZE => {
+                        if skip_finalize {
+                            return Err(DeriveError::new(quote_spanned! {
+                                span => compile_error!("Duplicate shredder flag");
+                            }));
+                        } else {
+                            skip_finalize = true;
                         }
                     }
                     UNSAFE_SKIP_GC_DEREF => {
@@ -140,6 +152,7 @@ impl DeriveFieldFlags {
 
         if unsafe_skip_all {
             skip_scan = true;
+            skip_finalize = true;
             unsafe_skip_gc_deref = true;
             unsafe_skip_gc_drop = true;
             unsafe_skip_gc_safe = true;
@@ -147,6 +160,7 @@ impl DeriveFieldFlags {
 
         Ok(Self {
             skip_scan,
+            skip_finalize,
             unsafe_skip_gc_deref,
             unsafe_skip_gc_drop,
             unsafe_skip_gc_safe,
